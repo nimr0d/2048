@@ -1,5 +1,6 @@
 #ifndef _BOARD_H_
 #define _BOARD_H_
+
 typedef unsigned short bitboard;
 
 char lsb(bitboard b);

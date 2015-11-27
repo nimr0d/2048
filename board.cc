@@ -12,7 +12,7 @@ char unset_lsb(bitboard b) {
 namespace bitboards {
 	void init() {
 		for (char p = 0; p < 16; ++p) {
-			sqr[p] = 1u << p;
+			sqr[p] = 1 << p;
 		}
 	}
 	bitboard sqr[16];
@@ -39,11 +39,10 @@ int board::eval() const {
 
 board *board::left() const {
 	board *n = new board();
-	for (int i = 0; i < 4; ++i) {
+	for (int p = 0; p < 16;) {
 		int count = 0;
 		bool coll = false;
-		for (int j = 0; j < 4; ++j) {
-			int p = 4 * i + j;
+		for (const int bnd = p + 4; p < bnd; ++p) {
 			if (b_[p] == 0) {
 				++count;
 			}
@@ -57,7 +56,7 @@ board *board::left() const {
 				coll = true;
 			}
 		}
-		n->space_ |= ((1u << (4 - count)) - 1) << (i << 2);
+		n->space_ |= ((1 << count) - 1) << (p - count);
 		n->num_empty_ += count;
 	}
 	return n;
@@ -65,11 +64,10 @@ board *board::left() const {
 
 board *board::right() const {
 	board *n = new board();
-	for (int i = 0; i < 4; ++i) {
+	for (int p = 15; p >= 0;) {
 		int count = 0;
 		bool coll = false;
-		for (int j = 3; j >= 0; --j) {
-			int p = 4 * i + j;
+		for (const int bnd = p - 3; p >= bnd; --p) {
 			if (b_[p] == 0) {
 				++count;
 			}
@@ -83,7 +81,7 @@ board *board::right() const {
 				coll = true;
 			}
 		}
-		n->space_ |= ((1 << (4 - count)) - 1) << ((i << 2));
+		n->space_ |= ((1 << count) - 1) << (p + 1);
 		n->num_empty_ += count;
 	}
 	return n;
@@ -93,8 +91,7 @@ board *board::up() const {
 	for (int j = 0; j < 4; ++j) {
 		int count = 0;
 		bool coll = false;
-		for (int i = 0; i < 4; ++i) {
-			int p = 4 * i + j;
+		for (int p = j; p < 16; p += 4) {
 			if (b_[p] == 0) {
 				++count;
 			}
@@ -117,8 +114,7 @@ board *board::down() const {
 	for (int j = 0; j < 4; ++j) {
 		int count = 0;
 		bool coll = false;
-		for (int i = 3; i >= 0; --i) {
-			int p = 4 * i + j;
+		for (int p = 12 + j; p >= j; p -= 4) {
 			if (b_[p] == 0) {
 				++count;
 			}
