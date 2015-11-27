@@ -1,29 +1,28 @@
 #include "board.h"
 
-char lsb(bitboard b) {
+uint8_t lsb(bitboard b) {
 	return __builtin_ffs(b);
 }
-char unset_lsb(bitboard b) {
-	char c = __builtin_ffs(b);
-	b &= (b - 1);
-	return c;
+
+bitboard unset_lsb(bitboard b) {
+	return b & (b - 1);
 }
 
 namespace bitboards {
 	void init() {
-		for (char p = 0; p < 16; ++p) {
+		for (uint8_t p = 0; p < 16; ++p) {
 			sqr[p] = 1 << p;
 		}
 	}
 	bitboard sqr[16];
 }
 
-board::board() {
+board::board(bool player) : player_(player) {
 	space_ = 0;
 	num_empty_ = 0;
 }
 
-board::board(char b[16]) : board() {
+board::board(tile b[16], bool player) : board(player) {
 	for (int i = 0; i < 16; ++i) {
 		b_[i] = b[i];
 		if (!b[i]) {
@@ -38,7 +37,7 @@ int board::eval() const {
 }
 
 board *board::left() const {
-	board *n = new board();
+	board *n = new board(!player_);
 	for (int p = 0; p < 16;) {
 		int count = 0;
 		bool coll = false;
@@ -63,7 +62,7 @@ board *board::left() const {
 }
 
 board *board::right() const {
-	board *n = new board();
+	board *n = new board(!player_);
 	for (int p = 15; p >= 0;) {
 		int count = 0;
 		bool coll = false;
@@ -86,8 +85,9 @@ board *board::right() const {
 	}
 	return n;
 }
+
 board *board::up() const {
-	board *n = new board();
+	board *n = new board(!player_);
 	for (int j = 0; j < 4; ++j) {
 		int count = 0;
 		bool coll = false;
@@ -109,8 +109,9 @@ board *board::up() const {
 	}
 	return n;
 }
+
 board *board::down() const {
-	board *n = new board();
+	board *n = new board(!player_);
 	for (int j = 0; j < 4; ++j) {
 		int count = 0;
 		bool coll = false;
@@ -132,19 +133,28 @@ board *board::down() const {
 	}
 	return n;
 }
-board *board::place(char tile, char pos) const {
+
+board *board::place(uint8_t tile, uint8_t pos) const {
 	board *n = new board(*this);
 	n->b_[pos] = tile;
 	n->space_ ^= bitboards::sqr[pos];
+	n->player_ = !n->player_;
 	--n->num_empty_;
 	return n;
 }
-int board::operator[](int i) const {
+
+bool board::player() const {
+	return player_;
+}
+
+tile board::operator[](int i) const {
 	return b_[i];
 }
+
 bitboard board::space() const {
 	return space_;
 }
+
 int board::num_empty() const {
 	return num_empty_;
 }

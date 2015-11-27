@@ -28,8 +28,8 @@ void print_bb(bitboard b) {
 
 int main() {
 	bitboards::init();
-	char b[16] = {1, 1, 0, 1, 2, 0, 2, 3, 2, 1, 0, 0, 0, 1, 1, 0};
-	board bd(b);
+	tile b[16] = {1, 1, 0, 1, 2, 0, 2, 3, 2, 1, 0, 0, 0, 1, 1, 0};
+	board bd(b, 0);
 	print_board(&bd);
 	print_board(bd.left());
 	print_bb(bd.left()->space());

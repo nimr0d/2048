@@ -1,10 +1,15 @@
 #ifndef _BOARD_H_
 #define _BOARD_H_
 
-typedef unsigned short bitboard;
+#define P1 0
+#define P2 1
 
-char lsb(bitboard b);
-char unset_lsb(bitboard b);
+typedef unsigned short bitboard;
+typedef unsigned char tile;
+typedef unsigned char uint8_t;
+
+uint8_t lsb(bitboard b);
+bitboard unset_lsb(bitboard b);
 
 namespace bitboards {
 	void init();
@@ -14,22 +19,24 @@ namespace bitboards {
 /*Immutable board representation*/
 class board {
 public:
-	board();
-	board(char b[16]);
+	board(bool player);
+	board(tile b[16], bool player);
 	board(const board &b) = default;
 	int eval() const;
 	board *left() const;
 	board *right() const;
 	board *up() const;
 	board *down() const;
-	board *place(char tile, char pos) const;
-	int operator[](int i) const;
+	board *place(tile t, uint8_t pos) const;
+	bool player() const;
+	tile operator[](int i) const;
 	bitboard space() const;
 	int num_empty() const;
 
 private:
-	char b_[16];
+	bool player_;
+	tile b_[16];
 	bitboard space_;
-	char num_empty_;
+	uint8_t num_empty_;
 };
 #endif // _BOARD_H_
