@@ -6,8 +6,8 @@ char lsb(bitboard b);
 char unset_lsb(bitboard b);
 
 namespace bitboards {
-	bitboard sqr[16];
 	void init();
+	extern bitboard sqr[16];
 }
 
 /*Immutable board representation*/
@@ -22,7 +22,9 @@ public:
 	board *up() const;
 	board *down() const;
 	board *place(char tile, char pos) const;
+	int operator[](int i) const;
 	bitboard space() const;
+	int num_empty() const;
 
 private:
 	char b_[16];

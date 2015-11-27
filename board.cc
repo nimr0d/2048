@@ -9,10 +9,13 @@ char unset_lsb(bitboard b) {
 	return c;
 }
 
-void bitboards::init() {
-	for (char p = 0; p < 16; ++p) {
-		sqr[p] = 1u << p;
+namespace bitboards {
+	void init() {
+		for (char p = 0; p < 16; ++p) {
+			sqr[p] = 1u << p;
+		}
 	}
+	bitboard sqr[16];
 }
 
 board::board() {
@@ -80,6 +83,12 @@ board *board::place(char tile, char pos) const {
 	--n->num_empty_;
 	return n;
 }
+int board::operator[](int i) const {
+	return b_[i];
+}
 bitboard board::space() const {
 	return space_;
+}
+int board::num_empty() const {
+	return num_empty_;
 }
