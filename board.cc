@@ -1,7 +1,7 @@
 #include "board.h"
 
 char lsb(bitboard b) {
-	return __builtin_ffs(b)
+	return __builtin_ffs(b);
 }
 char unset_lsb(bitboard b) {
 	char c = __builtin_ffs(b);
@@ -9,12 +9,23 @@ char unset_lsb(bitboard b) {
 	return c;
 }
 
-board::board(char b[16]) {
+void bitboards::init() {
+	for (char p = 0; p < 16; ++p) {
+		sqr[p] = 1u << p;
+	}
+}
+
+board::board() {
+	space_ = 0u;
+	num_empty_ = 0;
+}
+
+board::board(char b[16]) : board() {
 	for (int i = 0; i < 16; ++i) {
-		if (b[i]) {
-			tiles_[b[i]] |= sqr[i];
-		} else {
-			space_ |= sqr[i];
+		b_[i] = b[i];
+		if (!b[i]) {
+			space_ |= bitboards::sqr[i];
+			++num_empty_;
 		}
 	}
 }
@@ -24,38 +35,51 @@ int board::eval() const {
 }
 
 board *board::left() const {
-	board *b = new board();
+	board *n = new board();
+	n->num_empty_ = num_empty_;
 	for (int i = 0; i < 4; ++i) {
 		int count = 0;
-		for (int j = 0; i < 3; ++j) {
+		bool coll = false;
+		for (int j = 0; j < 4; ++j) {
 			int p = 4 * i + j;
-			for (int tile = 0; tile < 17; ++tile) {
-				bitboard t = tiles_[tile];
-				if (t & sqr[p]) {
-					b->tiles_[tile] |= sq[p - count];
-					if (t & sqr[p + 1]) {
-						++j;
-						++count;
-					}
-					break;
-				}
+			if (b_[p] == 0) {
+				++count;
+			}
+			else if (coll && n->b_[p - count - 1] == b_[p]) {
+				++count;
+				++n->b_[p - count];
+				coll = false;
+			}
+			else {
+				n->b_[p - count] = b_[p];
+				coll = true;
 			}
 		}
+		n->space_ |= ((1u << (4 - count)) - 1) << (i << 2);
+		n->num_empty_ -= count;
 	}
-	for (int tile = 0; tile < 17; ++tile) {
-		b->space_ &= ~(b->tiles_[tile]);
-	}
-	return b;
+	return n;
 }
-board *board::right() const;
-board *board::up() const;
-board *board::down() const;
+
+board *board::right() const {
+	board *n = new board();
+	return n;
+}
+board *board::up() const {
+	board *n = new board();
+	return n;
+}
+board *board::down() const {
+	board *n = new board();
+	return n;
+}
 board *board::place(char tile, char pos) const {
-	board *b = new board(*this);
-	b->tiles[tile] |= sqr[pos];
-	b->space ^= sqr[pos];
-	return b;
+	board *n = new board(*this);
+	n->b_[pos] = tile;
+	n->space_ ^= bitboards::sqr[pos];
+	--n->num_empty_;
+	return n;
 }
-bitboard board::space() {
+bitboard board::space() const {
 	return space_;
 }
