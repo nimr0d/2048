@@ -19,7 +19,7 @@ namespace bitboards {
 }
 
 board::board() {
-	space_ = 0u;
+	space_ = 0;
 	num_empty_ = 0;
 }
 
@@ -39,7 +39,6 @@ int board::eval() const {
 
 board *board::left() const {
 	board *n = new board();
-	n->num_empty_ = num_empty_;
 	for (int i = 0; i < 4; ++i) {
 		int count = 0;
 		bool coll = false;
@@ -59,21 +58,82 @@ board *board::left() const {
 			}
 		}
 		n->space_ |= ((1u << (4 - count)) - 1) << (i << 2);
-		n->num_empty_ -= count;
+		n->num_empty_ += count;
 	}
 	return n;
 }
 
 board *board::right() const {
 	board *n = new board();
+	for (int i = 0; i < 4; ++i) {
+		int count = 0;
+		bool coll = false;
+		for (int j = 3; j >= 0; --j) {
+			int p = 4 * i + j;
+			if (b_[p] == 0) {
+				++count;
+			}
+			else if (coll && n->b_[p + count + 1] == b_[p]) {
+				++count;
+				++n->b_[p + count];
+				coll = false;
+			}
+			else {
+				n->b_[p + count] = b_[p];
+				coll = true;
+			}
+		}
+		n->space_ |= ((1 << (4 - count)) - 1) << ((i << 2));
+		n->num_empty_ += count;
+	}
 	return n;
 }
 board *board::up() const {
 	board *n = new board();
+	for (int j = 0; j < 4; ++j) {
+		int count = 0;
+		bool coll = false;
+		for (int i = 0; i < 4; ++i) {
+			int p = 4 * i + j;
+			if (b_[p] == 0) {
+				++count;
+			}
+			else if (coll && n->b_[p - 4 * (count + 1)] == b_[p]) {
+				++count;
+				++n->b_[p - 4 * count];
+				coll = false;
+			}
+			else {
+				n->b_[p - 4 * count] = b_[p];
+				coll = true;
+			}
+		}
+		n->num_empty_ += count;
+	}
 	return n;
 }
 board *board::down() const {
 	board *n = new board();
+	for (int j = 0; j < 4; ++j) {
+		int count = 0;
+		bool coll = false;
+		for (int i = 3; i >= 0; --i) {
+			int p = 4 * i + j;
+			if (b_[p] == 0) {
+				++count;
+			}
+			else if (coll && n->b_[p + 4 * (count + 1)] == b_[p]) {
+				++count;
+				++n->b_[p + 4 * count];
+				coll = false;
+			}
+			else {
+				n->b_[p + 4 * count] = b_[p];
+				coll = true;
+			}
+		}
+		n->num_empty_ += count;
+	}
 	return n;
 }
 board *board::place(char tile, char pos) const {
