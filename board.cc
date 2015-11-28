@@ -1,5 +1,8 @@
 #include "board.h"
 
+#define R1 .4
+#define R2 R1 * R1
+
 uint8_t lsb(bitboard b) {
 	return __builtin_ffs(b);
 }
@@ -31,17 +34,6 @@ board::board(tile b[16]) {
 
 int board::eval() const {
 	int e = num_empty_;
-	/*tile best = 0;
-	uint8_t b_i = 0;
-	for (uint8_t i = 0; i < 16; ++i) {
-		if (b_[i] > best) {
-			best = b_[i];
-			b_i = i;
-		}
-	}
-	if (b_i == 0 || b_i == 3 || b_i == 12 || b_i == 15) {
-		int m = num_empty_ + 4;
-	}*/
 	return e;
 }
 

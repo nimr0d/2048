@@ -22,7 +22,7 @@ int minimax_p1(const board *b, unsigned short depth, int alpha, int beta) {
 	if (depth == 0) {
 		return b->eval();
 	}
-	int v = MIN_EVAL;
+	int v = -depth;
 	std::vector<board *> children;
 	board l, r, u, d;
 

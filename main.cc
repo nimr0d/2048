@@ -44,7 +44,7 @@ int main() {
 			space = unset_lsb(space);
 		}
 
-		tile t = (rand() % 100 > 90) ? 2 : 1;
+		tile t = (rand() % 100 < 90) ? 1 : 2;
 		bd.place(&n, t, spaces[rand() % N]);
 
 		bd = n;
@@ -53,7 +53,10 @@ int main() {
 		print_board(&bd);
 		std::cout << "\n";
 
-		switch (best_move(&bd, 12)) {
+		int depth = 12;
+		if (bd.num_empty() > 9) depth = 18 - 2 * ((bd.num_empty() + 1) / 2);
+
+		switch (best_move(&bd, depth)) {
 			case LEFT:
 				bd.left(&n);
 				break;
