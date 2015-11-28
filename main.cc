@@ -2,6 +2,7 @@
 #include "board.h"
 #include "search.h"
 #include <cstdlib>
+#include <time.h>
 
 void print_board(board *b) {
 	for (int p = 0; p < 16;) {
@@ -16,7 +17,6 @@ void print_board(board *b) {
 		}
 		std::cout << "\n";
 	}
-	std::cout << "Empty spaces: " << b->num_empty() << "\n";
 }
 void print_bb(bitboard b) {
 	for (int p = 0; p < 16;) {
@@ -30,9 +30,54 @@ void print_bb(bitboard b) {
 
 int main() {
 	bitboards::init();
-	tile b[16] = {1, 1, 0, 1, 2, 0, 2, 3, 2, 1, 0, 0, 0, 1, 1, 0};
+	tile b[16] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+
 	board bd(b);
-	
+	srand (time(NULL));
+	while (true) {
+		board n;
+		uint8_t N = bd.num_empty();
+		bitboard space = bd.space();
+		uint8_t spaces[N];
+		for (uint8_t i = 0; i < N; ++i) {
+			spaces[i] = lsb(space) - 1;
+			space = unset_lsb(space);
+		}
+
+		tile t = (rand() % 100 > 90) ? 2 : 1;
+		bd.place(&n, t, spaces[rand() % N]);
+
+		bd = n;
+
+		// std::cout << "After placement: \n";
+		print_board(&bd);
+		std::cout << "\n";
+
+		switch (best_move(&bd, 12)) {
+			case LEFT:
+				bd.left(&n);
+				break;
+			case RIGHT:
+				bd.right(&n);
+				break;
+			case UP:
+				bd.up(&n);
+				break;
+			case DOWN:
+				bd.down(&n);
+				break;
+			case NONE:
+				return 0;
+			default:
+				std::cout << "Error\n";
+				break;
+		}
+		bd = n;
+		// std::cout << "After best move: \n";
+		// print_board(&bd);
+		// std::cout << "\n";
+	}
+
 	/*print_board(&bd);
 	print_board(&bdl);
 	print_bb(bdl.space());
@@ -43,5 +88,5 @@ int main() {
 	print_board(&bdd);
 	print_bb(bdd.space());*/
 
-	std::cout << best_move(&bd, 12) << "\n";
+	// std::cout << best_move(&bd, 12) << "\n";
 }

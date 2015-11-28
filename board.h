@@ -6,7 +6,7 @@ enum player {
 };
 
 enum direction {
-	LEFT, RIGHT, UP, DOWN
+	LEFT, RIGHT, UP, DOWN, NONE
 };
 
 typedef unsigned short bitboard;

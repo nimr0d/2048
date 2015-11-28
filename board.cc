@@ -30,7 +30,19 @@ board::board(tile b[16]) {
 }
 
 int board::eval() const {
-	return num_empty_;
+	int e = num_empty_;
+	/*tile best = 0;
+	uint8_t b_i = 0;
+	for (uint8_t i = 0; i < 16; ++i) {
+		if (b_[i] > best) {
+			best = b_[i];
+			b_i = i;
+		}
+	}
+	if (b_i == 0 || b_i == 3 || b_i == 12 || b_i == 15) {
+		int m = num_empty_ + 4;
+	}*/
+	return e;
 }
 
 bool board::left(board *n) const {
@@ -47,15 +59,16 @@ bool board::left(board *n) const {
 				++count;
 				++n->b_[p - count];
 				coll = false;
+				r = true;
 			}
 			else {
 				n->b_[p - count] = b_[p];
 				coll = true;
+				r = r || count;
 			}
 		}
 		n->space_ |= ((1 << count) - 1) << (p - count);
 		n->num_empty_ += count;
-		r = r || count;
 	}
 	return r;
 }
@@ -74,15 +87,16 @@ bool board::right(board *n) const {
 				++count;
 				++n->b_[p + count];
 				coll = false;
+				r = true;
 			}
 			else {
 				n->b_[p + count] = b_[p];
 				coll = true;
+				r = r || count;
 			}
 		}
 		n->space_ |= ((1 << count) - 1) << (p + 1);
 		n->num_empty_ += count;
-		r = r || count;
 	}
 	return r;
 }
@@ -93,7 +107,8 @@ bool board::up(board *n) const {
 	for (uint8_t j = 0; j < 4; ++j) {
 		uint8_t count = 0;
 		bool coll = false;
-		for (uint8_t p = j; p < 16; p += 4) {
+		uint8_t p = j;
+		for (; p < 16; p += 4) {
 			if (b_[p] == 0) {
 				++count;
 			}
@@ -101,15 +116,16 @@ bool board::up(board *n) const {
 				++count;
 				++n->b_[p - 4 * count];
 				coll = false;
+				r = true;
 			}
 			else {
 				n->b_[p - 4 * count] = b_[p];
 				coll = true;
+				r = r || count;
 			}
 		}
-		n->space_ |= (((1 << (4 * count)) - 1) / 15) << j;
+		n->space_ |= (((1 << (4 * count)) - 1) / 15) << (j + 4 * (4 - count));
 		n->num_empty_ += count;
-		r = r || count;
 	}
 	return r;
 }
@@ -120,7 +136,8 @@ bool board::down(board *n) const {
 	for (int8_t j = 0; j < 4; ++j) {
 		uint8_t count = 0;
 		bool coll = false;
-		for (int8_t p = 12 + j; p >= j; p -= 4) {
+		int8_t p = 12 + j;
+		for (; p >= j; p -= 4) {
 			if (b_[p] == 0) {
 				++count;
 			}
@@ -128,15 +145,16 @@ bool board::down(board *n) const {
 				++count;
 				++n->b_[p + 4 * count];
 				coll = false;
+				r = true;
 			}
 			else {
 				n->b_[p + 4 * count] = b_[p];
 				coll = true;
+				r = r || count;
 			}
 		}
-		n->space_ |= (((1 << (4 * count)) - 1) / 15) << (j + 4 * (4 - count));
+		n->space_ |= (((1 << (4 * count)) - 1) / 15) << j;
 		n->num_empty_ += count;
-		r = r || count;
 	}
 	return r;
 }
