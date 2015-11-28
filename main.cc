@@ -1,5 +1,7 @@
 #include <iostream>
 #include "board.h"
+#include "search.h"
+#include <cstdlib>
 
 void print_board(board *b) {
 	for (int p = 0; p < 16;) {
@@ -30,19 +32,16 @@ int main() {
 	bitboards::init();
 	tile b[16] = {1, 1, 0, 1, 2, 0, 2, 3, 2, 1, 0, 0, 0, 1, 1, 0};
 	board bd(b);
-	board bdl, bdr, bdu, bdd;
-	bd.left(&bdl);
-	bd.right(&bdr);
-	bd.up(&bdu);
-	bd.down(&bdd);
-
-	print_board(&bd);
+	
+	/*print_board(&bd);
 	print_board(&bdl);
-	//print_bb(bdl.space());
+	print_bb(bdl.space());
 	print_board(&bdr);
-	//print_bb(bdr.space());
+	print_bb(bdr.space());
 	print_board(&bdu);
-	//print_bb(bdu.space());
+	print_bb(bdu.space());
 	print_board(&bdd);
-	//print_bb(bdd.space());
+	print_bb(bdd.space());*/
+
+	std::cout << best_move(&bd, 12) << "\n";
 }

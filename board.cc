@@ -107,6 +107,7 @@ bool board::up(board *n) const {
 				coll = true;
 			}
 		}
+		n->space_ |= (((1 << (4 * count)) - 1) / 15) << j;
 		n->num_empty_ += count;
 		r = r || count;
 	}
@@ -117,7 +118,7 @@ bool board::down(board *n) const {
 	n->clear();
 	bool r = false;
 	for (int8_t j = 0; j < 4; ++j) {
-		int8_t count = 0;
+		uint8_t count = 0;
 		bool coll = false;
 		for (int8_t p = 12 + j; p >= j; p -= 4) {
 			if (b_[p] == 0) {
@@ -133,6 +134,7 @@ bool board::down(board *n) const {
 				coll = true;
 			}
 		}
+		n->space_ |= (((1 << (4 * count)) - 1) / 15) << (j + 4 * (4 - count));
 		n->num_empty_ += count;
 		r = r || count;
 	}
@@ -160,7 +162,7 @@ int board::num_empty() const {
 }
 
 void board::clear() {
-	for (int i = 0; i < 16; ++i) {
+	for (uint8_t i = 0; i < 16; ++i) {
 		b_[i] = 0;
 	}
 	space_ = 0;

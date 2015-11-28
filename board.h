@@ -5,6 +5,10 @@ enum player {
 	P1, P2
 };
 
+enum direction {
+	LEFT, RIGHT, UP, DOWN
+};
+
 typedef unsigned short bitboard;
 typedef unsigned char tile;
 typedef unsigned char uint8_t;

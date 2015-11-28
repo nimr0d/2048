@@ -2,15 +2,19 @@
 #include <algorithm>
 #include <vector>
 
+#define MAX_EVAL 1000
+#define MIN_EVAL -1000
+
+
 struct comp_p1 {
 	bool operator()(board *a, board *b) {
-		return a->eval() < b->eval();
+		return a->eval() > b->eval();
 	}
 };
 
 struct comp_p2 {
 	bool operator()(const board &a, const board &b) {
-		return a.eval() > b.eval();
+		return a.eval() < b.eval();
 	}
 };
 
@@ -18,7 +22,7 @@ int minimax_p1(const board *b, unsigned short depth, int alpha, int beta) {
 	if (depth == 0) {
 		return b->eval();
 	}
-	int v = -INFTY // FIXME;
+	int v = MIN_EVAL;
 	std::vector<board *> children;
 	board l, r, u, d;
 
@@ -27,7 +31,7 @@ int minimax_p1(const board *b, unsigned short depth, int alpha, int beta) {
 	if (b->up(&u)) children.push_back(&u);
 	if (b->down(&d)) children.push_back(&d);
 
-	std::sort(children.begin(), children.end(), comp_p1);
+	std::sort(children.begin(), children.end(), comp_p1());
 
 	for (board *child : children) {
 		int s = minimax_p2(child, depth - 1, alpha, beta);
@@ -42,7 +46,7 @@ int minimax_p2(const board *b, unsigned short depth, int alpha, int beta) {
 	if (depth == 0) {
 		return b->eval();
 	}
-	int v = INFTY // FIXME;
+	int v = MAX_EVAL;
 	uint8_t N = 2 * b->num_empty();
 	bitboard space = b->space();
 	board children[N];
@@ -52,7 +56,7 @@ int minimax_p2(const board *b, unsigned short depth, int alpha, int beta) {
 		b->place(children + i, 1, pos);
 		b->place(children + (i + 1), 2, pos);
 	}
-	std::sort(children, children + N, comp_p2);
+	std::sort(children, children + N, comp_p2());
 
 	for (uint8_t i = 0; i < N; ++i) {
 		int s = minimax_p1(children + i, depth - 1, alpha, beta);
@@ -61,4 +65,28 @@ int minimax_p2(const board *b, unsigned short depth, int alpha, int beta) {
 		if (beta <= alpha) break;
 	}
 	return v;
+}
+
+direction best_move(const board *b, unsigned short depth) {
+	int v = MIN_EVAL;
+	int alpha = MIN_EVAL;
+	int beta = MAX_EVAL;
+	direction best_dir;
+	std::vector<board *> children;
+	board l, r, u, d;
+
+	if (b->left(&l)) children.push_back(&l);
+	if (b->right(&r)) children.push_back(&r);
+	if (b->up(&u)) children.push_back(&u);
+	if (b->down(&d)) children.push_back(&d);
+
+	for (uint8_t i = 0; i < children.size(); ++i) {
+		int s = minimax_p2(children[i], depth - 1, alpha, beta);
+		if (s > v) v = s;
+		if (v > alpha) {
+			alpha = v;
+			best_dir = (direction) i;
+		}
+	}
+	return best_dir;
 }
