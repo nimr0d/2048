@@ -29,15 +29,20 @@ void print_bb(bitboard b) {
 int main() {
 	bitboards::init();
 	tile b[16] = {1, 1, 0, 1, 2, 0, 2, 3, 2, 1, 0, 0, 0, 1, 1, 0};
-	board bd(b, 0);
+	board bd(b);
+	board bdl, bdr, bdu, bdd;
+	bd.left(&bdl);
+	bd.right(&bdr);
+	bd.up(&bdu);
+	bd.down(&bdd);
+
 	print_board(&bd);
-	print_board(bd.left());
-	print_bb(bd.left()->space());
-	print_board(bd.right());
-	print_bb(bd.right()->space());
-	print_board(bd.up());
-	print_bb(bd.up()->space());
-	print_board(bd.down());
-	print_bb(bd.down()->space());
-	print_board(bd.place(4, 2));
+	print_board(&bdl);
+	//print_bb(bdl.space());
+	print_board(&bdr);
+	//print_bb(bdr.space());
+	print_board(&bdu);
+	//print_bb(bdu.space());
+	print_board(&bdd);
+	//print_bb(bdd.space());
 }

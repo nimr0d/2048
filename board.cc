@@ -17,12 +17,9 @@ namespace bitboards {
 	bitboard sqr[16];
 }
 
-board::board(bool player) : player_(player) {
+board::board(tile b[16]) {
 	space_ = 0;
 	num_empty_ = 0;
-}
-
-board::board(tile b[16], bool player) : board(player) {
 	for (int i = 0; i < 16; ++i) {
 		b_[i] = b[i];
 		if (!b[i]) {
@@ -36,12 +33,13 @@ int board::eval() const {
 	return num_empty_;
 }
 
-board *board::left() const {
-	board *n = new board(!player_);
-	for (int p = 0; p < 16;) {
-		int count = 0;
+bool board::left(board *n) const {
+	n->clear();
+	bool r = false;
+	for (uint8_t p = 0; p < 16;) {
+		uint8_t count = 0;
 		bool coll = false;
-		for (const int bnd = p + 4; p < bnd; ++p) {
+		for (const uint8_t bnd = p + 4; p < bnd; ++p) {
 			if (b_[p] == 0) {
 				++count;
 			}
@@ -57,16 +55,18 @@ board *board::left() const {
 		}
 		n->space_ |= ((1 << count) - 1) << (p - count);
 		n->num_empty_ += count;
+		r = r || count;
 	}
-	return n;
+	return r;
 }
 
-board *board::right() const {
-	board *n = new board(!player_);
-	for (int p = 15; p >= 0;) {
-		int count = 0;
+bool board::right(board *n) const {
+	n->clear();
+	bool r = false;
+	for (int8_t p = 15; p >= 0;) {
+		uint8_t count = 0;
 		bool coll = false;
-		for (const int bnd = p - 3; p >= bnd; --p) {
+		for (const uint8_t bnd = p - 3; p >= bnd; --p) {
 			if (b_[p] == 0) {
 				++count;
 			}
@@ -82,16 +82,18 @@ board *board::right() const {
 		}
 		n->space_ |= ((1 << count) - 1) << (p + 1);
 		n->num_empty_ += count;
+		r = r || count;
 	}
-	return n;
+	return r;
 }
 
-board *board::up() const {
-	board *n = new board(!player_);
-	for (int j = 0; j < 4; ++j) {
-		int count = 0;
+bool board::up(board *n) const {
+	n->clear();
+	bool r = false;
+	for (uint8_t j = 0; j < 4; ++j) {
+		uint8_t count = 0;
 		bool coll = false;
-		for (int p = j; p < 16; p += 4) {
+		for (uint8_t p = j; p < 16; p += 4) {
 			if (b_[p] == 0) {
 				++count;
 			}
@@ -106,16 +108,18 @@ board *board::up() const {
 			}
 		}
 		n->num_empty_ += count;
+		r = r || count;
 	}
-	return n;
+	return r;
 }
 
-board *board::down() const {
-	board *n = new board(!player_);
-	for (int j = 0; j < 4; ++j) {
-		int count = 0;
+bool board::down(board *n) const {
+	n->clear();
+	bool r = false;
+	for (int8_t j = 0; j < 4; ++j) {
+		int8_t count = 0;
 		bool coll = false;
-		for (int p = 12 + j; p >= j; p -= 4) {
+		for (int8_t p = 12 + j; p >= j; p -= 4) {
 			if (b_[p] == 0) {
 				++count;
 			}
@@ -130,22 +134,18 @@ board *board::down() const {
 			}
 		}
 		n->num_empty_ += count;
+		r = r || count;
 	}
-	return n;
+	return r;
 }
 
-board *board::place(uint8_t tile, uint8_t pos) const {
-	board *n = new board(*this);
-	n->b_[pos] = tile;
+void board::place(board *n, tile t, uint8_t pos) const {
+	*n = board(*this);
+	n->b_[pos] = t;
 	n->space_ ^= bitboards::sqr[pos];
-	n->player_ = !n->player_;
 	--n->num_empty_;
-	return n;
 }
 
-bool board::player() const {
-	return player_;
-}
 
 tile board::operator[](int i) const {
 	return b_[i];
@@ -157,4 +157,12 @@ bitboard board::space() const {
 
 int board::num_empty() const {
 	return num_empty_;
+}
+
+void board::clear() {
+	for (int i = 0; i < 16; ++i) {
+		b_[i] = 0;
+	}
+	space_ = 0;
+	num_empty_ = 0;
 }
